@@ -192,7 +192,7 @@ public class GiveItem implements Listener {
 	@EventHandler
 	public void onDeath(PlayerDeathEvent e) {
 		if (e.getEntity() instanceof Player) {
-			Game getGame = BedwarsRel.getInstance().getGameManager().getGameOfPlayer((Player) e.getEntity());
+			Game getGame = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(e.getEntity());
 			if (getGame == null) {
 				return;
 			}

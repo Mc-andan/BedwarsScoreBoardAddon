@@ -23,7 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import io.github.bedwarsrel.game.Game;
 import io.github.bedwarsrel.game.GameState;
 import io.github.bedwarsrel.game.Team;
-import ldcr.BedwarsXP.api.XPManager;
+//import ldcr.BedwarsXP.api.XPManager;
 import lombok.Getter;
 import me.ram.bedwarsscoreboardaddon.Main;
 import me.ram.bedwarsscoreboardaddon.addon.PlaySound;
@@ -560,12 +560,12 @@ public class TeamShop {
 	private boolean pay(Player player, String cost) {
 		String[] ary = cost.split(",");
 		if (ary[0].equals("XP")) {
-			if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
-				if (XPManager.getXPManager(game.getName()).getXP(player) >= Integer.valueOf(ary[1])) {
-					XPManager.getXPManager(game.getName()).takeXP(player, Integer.valueOf(ary[1]));
-					return true;
-				}
-			}
+//			if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
+//				if (XPManager.getXPManager(game.getName()).getXP(player) >= Integer.valueOf(ary[1])) {
+//					XPManager.getXPManager(game.getName()).takeXP(player, Integer.valueOf(ary[1]));
+//					return true;
+//				}
+//			}
 		} else if (isEnoughItem(player, ary)) {
 			takeItem(player, ary);
 			return true;
@@ -576,9 +576,9 @@ public class TeamShop {
 	private boolean isEnough(Player player, String cost) {
 		String[] ary = cost.split(",");
 		if (ary[0].equals("XP")) {
-			if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
-				return XPManager.getXPManager(game.getName()).getXP(player) >= Integer.valueOf(ary[1]);
-			}
+//			if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
+//				return XPManager.getXPManager(game.getName()).getXP(player) >= Integer.valueOf(ary[1]);
+//			}
 		} else {
 			return isEnoughItem(player, ary);
 		}

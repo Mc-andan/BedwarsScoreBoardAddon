@@ -44,7 +44,7 @@ import me.ram.bedwarsscoreboardaddon.arena.Arena;
 import me.ram.bedwarsscoreboardaddon.config.Config;
 import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
 import me.ram.bedwarsscoreboardaddon.utils.LocationUtil;
-import me.ram.bedwarsscoreboardaddon.utils.ServerJoinerUtil;
+//import me.ram.bedwarsscoreboardaddon.utils.ServerJoinerUtil;
 import me.ram.bedwarsscoreboardaddon.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
@@ -556,9 +556,9 @@ public class Spectator implements Listener {
 			}
 			if (e.getCurrentItem().isSimilar(joinitem)) {
 				e.setCancelled(true);
-				if (Bukkit.getPluginManager().isPluginEnabled("ServerJoiner")) {
-					ServerJoinerUtil.sendServer(player, Config.spectator_fast_join_group);
-				}
+//				if (Bukkit.getPluginManager().isPluginEnabled("ServerJoiner")) {
+//					ServerJoinerUtil.sendServer(player, Config.spectator_fast_join_group);
+//				}
 			}
 		}
 	}
@@ -633,9 +633,9 @@ public class Spectator implements Listener {
 		}
 		if (e.getItem() != null && e.getItem().isSimilar(joinitem) && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 			e.setCancelled(true);
-			if (Bukkit.getPluginManager().isPluginEnabled("ServerJoiner")) {
-				ServerJoinerUtil.sendServer(player, Config.spectator_fast_join_group);
-			}
+//			if (Bukkit.getPluginManager().isPluginEnabled("ServerJoiner")) {
+//				ServerJoinerUtil.sendServer(player, Config.spectator_fast_join_group);
+//			}
 		}
 	}
 

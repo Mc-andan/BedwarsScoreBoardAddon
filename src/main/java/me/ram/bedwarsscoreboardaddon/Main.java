@@ -1,31 +1,8 @@
 package me.ram.bedwarsscoreboardaddon;
 
-import java.util.concurrent.Callable;
-
-import org.bstats.metrics.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredListener;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import io.github.bedwarsrel.BedwarsRel;
-import ldcr.BedwarsXP.EventListeners;
 import lombok.Getter;
-import me.ram.bedwarsscoreboardaddon.addon.ChatFormat;
-import me.ram.bedwarsscoreboardaddon.addon.Compass;
-import me.ram.bedwarsscoreboardaddon.addon.DeathItem;
-import me.ram.bedwarsscoreboardaddon.addon.GiveItem;
-import me.ram.bedwarsscoreboardaddon.addon.HidePlayer;
-import me.ram.bedwarsscoreboardaddon.addon.LobbyScoreBoard;
-import me.ram.bedwarsscoreboardaddon.addon.Shop;
-import me.ram.bedwarsscoreboardaddon.addon.SpawnNoBuild;
-import me.ram.bedwarsscoreboardaddon.addon.Spectator;
-import me.ram.bedwarsscoreboardaddon.addon.TimeTask;
-import me.ram.bedwarsscoreboardaddon.addon.Title;
-import me.ram.bedwarsscoreboardaddon.addon.WitherBow;
+import me.ram.bedwarsscoreboardaddon.addon.*;
 import me.ram.bedwarsscoreboardaddon.arena.Arena;
 import me.ram.bedwarsscoreboardaddon.command.BedwarsRelCommandTabCompleter;
 import me.ram.bedwarsscoreboardaddon.command.CommandTabCompleter;
@@ -34,12 +11,17 @@ import me.ram.bedwarsscoreboardaddon.config.Config;
 import me.ram.bedwarsscoreboardaddon.config.LocaleConfig;
 import me.ram.bedwarsscoreboardaddon.edit.EditGame;
 import me.ram.bedwarsscoreboardaddon.listener.EventListener;
-import me.ram.bedwarsscoreboardaddon.listener.XPEventListener;
 import me.ram.bedwarsscoreboardaddon.manager.ArenaManager;
 import me.ram.bedwarsscoreboardaddon.manager.EditHolographicManager;
 import me.ram.bedwarsscoreboardaddon.manager.HolographicManager;
 import me.ram.bedwarsscoreboardaddon.menu.MenuManager;
 import me.ram.bedwarsscoreboardaddon.networld.UpdateCheck;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+
+//import ldcr.BedwarsXP.EventListeners;//不使用BedwarsXP
 
 /**
  * @author Ram
@@ -157,23 +139,24 @@ public class Main extends JavaPlugin {
 			Bukkit.getPluginManager().disablePlugin(instance);
 			return;
 		}
-		if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
-			try {
-				Class.forName("ldcr.BedwarsXP.EventListeners").getConstructor().newInstance();
-				Plugin plugin = Bukkit.getPluginManager().getPlugin("BedwarsXP");
-				for (RegisteredListener listener : HandlerList.getRegisteredListeners(plugin)) {
-					if (listener.getListener() instanceof EventListeners) {
-						HandlerList.unregisterAll(listener.getListener());
-					}
-				}
-				Bukkit.getPluginManager().registerEvents(new XPEventListener(), this);
-			} catch (Exception e) {
-				printMessage(prefix + getLocaleConfig().getLanguage("bedwarsxp"));
-				printMessage(prefix + getLocaleConfig().getLanguage("loading_failed"));
-				Bukkit.getPluginManager().disablePlugin(instance);
-				return;
-			}
-		}
+		//不使用BedwarsXp
+//		if (Bukkit.getPluginManager().isPluginEnabled("BedwarsXP")) {
+//			try {
+//				Class.forName("ldcr.BedwarsXP.EventListeners").getConstructor().newInstance();
+//				Plugin plugin = Bukkit.getPluginManager().getPlugin("BedwarsXP");
+//				for (RegisteredListener listener : HandlerList.getRegisteredListeners(plugin)) {
+//					if (listener.getListener() instanceof EventListeners) {
+//						HandlerList.unregisterAll(listener.getListener());
+//					}
+//				}
+//				Bukkit.getPluginManager().registerEvents(new XPEventListener(), this);
+//			} catch (Exception e) {
+//				printMessage(prefix + getLocaleConfig().getLanguage("bedwarsxp"));
+//				printMessage(prefix + getLocaleConfig().getLanguage("loading_failed"));
+//				Bukkit.getPluginManager().disablePlugin(instance);
+//				return;
+//			}
+//		}
 		try {
 			Config.loadConfig();
 		} catch (Exception e) {
@@ -214,22 +197,22 @@ public class Main extends JavaPlugin {
 			return;
 		}
 		printMessage(prefix + getLocaleConfig().getLanguage("load_success"));
-		try {
-			Metrics metrics = new Metrics(this);
-			metrics.addCustomChart(new Metrics.SimplePie("pluginPrefix", new Callable<String>() {
-				@Override
-				public String call() throws Exception {
-					return BedwarsRel.getInstance().getConfig().getString("chat-prefix", ChatColor.GRAY + "[" + ChatColor.AQUA + "BedWars" + ChatColor.GRAY + "]");
-				}
-			}));
-			metrics.addCustomChart(new Metrics.SimplePie("language", new Callable<String>() {
-				@Override
-				public String call() throws Exception {
-					return localeConfig.getPluginLocale().getName();
-				}
-			}));
-		} catch (Exception e) {
-		}
+//		try {
+//			Metrics metrics = new Metrics(this);
+//			metrics.addCustomChart(new Metrics.SimplePie("pluginPrefix", new Callable<String>() {
+//				@Override
+//				public String call() throws Exception {
+//					return BedwarsRel.getInstance().getConfig().getString("chat-prefix", ChatColor.GRAY + "[" + ChatColor.AQUA + "BedWars" + ChatColor.GRAY + "]");
+//				}
+//			}));
+//			metrics.addCustomChart(new Metrics.SimplePie("language", new Callable<String>() {
+//				@Override
+//				public String call() throws Exception {
+//					return localeConfig.getPluginLocale().getName();
+//				}
+//			}));
+//		} catch (Exception e) {
+//		}
 		BedwarsRel.getInstance().getConfig().set("teamname-on-tab", false);
 		BedwarsRel.getInstance().getConfig().set("die-on-void", false);
 		BedwarsRel.getInstance().saveConfig();
@@ -250,6 +233,7 @@ public class Main extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new DeathItem(), this);
 		Bukkit.getPluginManager().registerEvents(new Spectator(), this);
 		Bukkit.getPluginManager().registerEvents(new GiveItem(), this);
+		Bukkit.getPluginManager().registerEvents(new Shears(), this);
 		Bukkit.getPluginManager().registerEvents(new TimeTask(), this);
 		Bukkit.getPluginManager().registerEvents(new EditGame(), this);
 		Bukkit.getPluginManager().registerEvents(new Compass(), this);
