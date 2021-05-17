@@ -1,7 +1,6 @@
 package me.ram.bedwarsscoreboardaddon.addon;
 
 import io.github.bedwarsrel.BedwarsRel;
-import io.github.bedwarsrel.events.BedwarsOpenShopEvent;
 import io.github.bedwarsrel.game.Game;
 import me.ram.bedwarsscoreboardaddon.Main;
 import me.ram.bedwarsscoreboardaddon.events.BoardAddonPlayerRespawnEvent;
@@ -10,15 +9,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.List;
 
-public class Shears implements Listener {
-    HashMap<Player,ItemStack> plist = new HashMap<>();
+public class Toolsupgrades implements Listener {
+    HashMap<Player, Integer> pickaxeList = new HashMap<>();
+    HashMap<Player, Integer> axeList = new HashMap<>();
+    HashMap<Integer,ItemStack> pickaxeItem = new HashMap<>();
+    HashMap<Integer,ItemStack> axeItem = new HashMap<>();
+
 
 
     @EventHandler
@@ -29,24 +32,10 @@ public class Shears implements Listener {
             return;
         }
         if (!game.isSpectator(player)) {
-            if (plist.containsKey(player)){
-                giveShears(player);
-            }
+//            if (plist.containsKey(player)){
+//                giveShears(player);
+//            }
         }
-    }
-//
-//    @EventHandler
-//    private void onopen(BedwarsOpenShopEvent e){
-//
-//    }
-
-    @EventHandler
-    private void ondrop(PlayerDropItemEvent e){
-        if (e.getItemDrop().getItemStack().equals(plist.get(e.getPlayer())))e.setCancelled(true);
-    }
-
-    private void giveShears(Player player) {
-        player.getInventory().addItem(plist.get(player));
     }
 
     @EventHandler
@@ -68,14 +57,33 @@ public class Shears implements Listener {
                     if (!meta.hasLore()) {
                         continue;
                     }
-                    if (stack.getType() == Material.SHEARS && meta.getLore().contains("§s§h§e§a§r§s")) {
-                        if (!plist.containsKey(player)){
-                            plist.put(player,stack);
+                    if (stack.getType().name().toLowerCase().contains("pickaxe")&& meta.getLore().contains("§p§i§c§k§a§x§e§")) {
+                        int i1 = getpickaxeLevel(meta.getLore());
+                        if (pickaxeList.containsKey(player)){
+                            int integer = pickaxeList.get(player);
+                            if (i1>integer){
+                                player.getInventory().remove(pickaxeItem.get(integer));
+                                pickaxeList.put(player,i1);
+
+                            }
+                        }else{
+                            pickaxeList.put(player,i1);
                         }
+                        pickaxeItem.put(i1,stack);
                     }
                 }
             }
         }.runTaskLater(Main.getInstance(), 1L);
+    }
+
+    private int getpickaxeLevel(List<String> lore) {
+        for (String s:lore){
+            if (s.contains("§p§i§c§k§a§x§e§")){
+                int level = Integer.parseInt(s.split("§p§i§c§k§a§x§e§")[1]);
+                return level;
+            }
+        }
+        return 0;
     }
 
 
