@@ -98,7 +98,7 @@ public class Holographic {
 				}
 			}
 
-		}.runTaskTimer(Main.getInstance(), 1L, 1L);
+		}.runTaskTimer(Main.getInstance(), 1L, 1L);//removehd
 	}
 
 	public Game getGame() {
@@ -150,7 +150,7 @@ public class Holographic {
 						spawner.getLocation().getBlock().getChunk().load(true);
 					}
 					HolographicAPI holo = new HolographicAPI(spawner.getLocation().clone().add(0, Main.getInstance().getConfig().getDouble("holographic.resource.resources." + res + ".height") - 0.35, 0), null);
-					holo.setEquipment(Arrays.asList(new ItemStack(Material.getMaterial(Main.getInstance().getConfig().getInt("holographic.resource.resources." + res + ".block")))));
+//					holo.setEquipment(Arrays.asList(new ItemStack(Material.getMaterial(Main.getInstance().getConfig().getInt("holographic.resource.resources." + res + ".block")))));
 					Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
 						for (Player player : game.getPlayers()) {
 							holo.display(player);
@@ -181,7 +181,7 @@ public class Holographic {
 					if (!holo.getLocation().getBlock().getChunk().isLoaded()) {
 						holo.getLocation().getBlock().getChunk().load(true);
 					}
-					moveArmorStand(holo, game);
+//					moveArmorStand(holo, game);
 				} else {
 					armor_locations.remove(holo);
 					armor_upward.remove(holo);
@@ -191,7 +191,7 @@ public class Holographic {
 					cancel();
 				}
 			}
-		}.runTaskTimer(Main.getInstance(), 1L, 1L);
+		}.runTaskTimer(Main.getInstance(), 1L, 19L);
 	}
 
 	private void setTitle(Game game, Location location, String title, ItemStack itemStack) {
@@ -227,7 +227,7 @@ public class Holographic {
 					return;
 				}
 			}
-		}.runTaskTimer(Main.getInstance(), 5L, 5L);
+		}.runTaskTimer(Main.getInstance(), 19L, 19L);
 	}
 
 	public void onPlayerLeave(Player player) {

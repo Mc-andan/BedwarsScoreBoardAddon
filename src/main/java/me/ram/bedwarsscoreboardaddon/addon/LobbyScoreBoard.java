@@ -46,7 +46,7 @@ public class LobbyScoreBoard implements Listener {
 					}
 				}
 			}
-		}.runTaskTimer(Main.getInstance(), 0L, 1L);
+		}.runTaskTimer(Main.getInstance(), 0L, 1L);//LobbyScoreBoard
 	}
 
 	@EventHandler

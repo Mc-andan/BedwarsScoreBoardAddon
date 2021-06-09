@@ -32,6 +32,13 @@ import me.ram.bedwarsscoreboardaddon.Main;
 import me.ram.bedwarsscoreboardaddon.config.Config;
 import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
 import me.ram.bedwarsscoreboardaddon.utils.ColorUtil;
+import protocolsupportpocketstuff.api.modals.SimpleForm;
+import protocolsupportpocketstuff.api.modals.callback.SimpleFormCallback;
+import protocolsupportpocketstuff.api.modals.elements.simple.ModalButton;
+import protocolsupportpocketstuff.api.util.PocketPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Compass implements Listener {
 
@@ -244,6 +251,75 @@ public class Compass implements Listener {
 	}
 
 	private void openMainMenu(Player player) {
+		if (PocketPlayer.isPocketPlayer(player)){
+			SimpleForm sf = new SimpleForm(Config.compass_gui_title,"");
+			Game gameOfPlayer = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
+			List<Runnable> runs = new ArrayList<>();
+			sf.addButton(new ModalButton(Config.compass_item_III_II));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_III_II.replace("{player}", player.getName()));
+			});
+			sf.addButton(new ModalButton(Config.compass_item_III_III));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_III_III.replace("{player}", player.getName()));
+			});
+
+			sf.addButton(new ModalButton(Config.compass_item_IV_II));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_IV_II.replace("{player}", player.getName()));
+			});
+
+			sf.addButton(new ModalButton(Config.compass_item_IV_III));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_IV_III.replace("{player}", player.getName()));
+			});
+
+			sf.addButton(new ModalButton(Config.compass_item_V_II));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_V_II.replace("{player}", player.getName()));
+			});
+
+			sf.addButton(new ModalButton(Config.compass_item_V_III));
+			runs.add(()->{
+				sendMessage(player, gameOfPlayer.getPlayerTeam(player), Config.compass_message_V_III.replace("{player}", player.getName()));
+			});
+
+
+			sf.addButton(new ModalButton(Config.compass_item_VI_II));
+			runs.add(()->{
+				openSelectTeamMenu(player,"§a§i");
+			});
+			sf.addButton(new ModalButton(Config.compass_item_VI_III));
+			runs.add(()->{
+				openSelectTeamMenu(player,"§a");
+			});
+			sf.addButton(new ModalButton(Config.compass_item_VII_II));
+			runs.add(()->{
+				openSelectResourcesMenu(player,"§c");
+			});
+			sf.addButton(new ModalButton(Config.compass_item_VII_III));
+			runs.add(()->{
+				openSelectResourcesMenu(player,"§n");
+			});
+			sf.addButton(new ModalButton(Config.compass_item_VIII_II));
+			runs.add(()->{
+				openSelectResourcesMenu(player,"§h");
+			});
+
+			SimpleFormCallback callback = new SimpleFormCallback() {
+				@Override
+				public void onSimpleFormResponse(Player player, String output, boolean quit, int slot) {
+					if (!quit && slot != -1) {
+						runs.get(slot).run();
+					}
+				}
+			};
+			Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> PocketPlayer.sendModal(player, sf, callback), 5L);
+
+
+
+			return;
+		}
 		Inventory inventory = Bukkit.createInventory(null, 36, Config.compass_gui_title);
 		ItemStack itemStack = new ItemStack(Material.BOOK);
 		ItemMeta itemMeta = itemStack.getItemMeta();
@@ -281,6 +357,7 @@ public class Compass implements Listener {
 		itemMeta.setLore(Config.compass_lore_send_message);
 		itemStack.setItemMeta(itemMeta);
 		inventory.setItem(22, itemStack);
+
 		itemStack = new ItemStack(Material.IRON_SWORD);
 		itemMeta = itemStack.getItemMeta();
 		itemMeta.setDisplayName(Config.compass_item_VI_II);
@@ -295,6 +372,7 @@ public class Compass implements Listener {
 		itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		itemStack.setItemMeta(itemMeta);
 		inventory.setItem(23, itemStack);
+
 		itemStack = new ItemStack(Material.DIAMOND);
 		itemMeta = itemStack.getItemMeta();
 		itemMeta.setDisplayName(Config.compass_item_VII_II);
@@ -317,11 +395,40 @@ public class Compass implements Listener {
 	}
 
 	private void openSelectTeamMenu(Player player, String gui) {
-		Inventory inventory = Bukkit.createInventory(null, 36, Config.compass_gui_title + gui);
 		Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
 		if (game == null) {
 			return;
 		}
+		if (PocketPlayer.isPocketPlayer(player)){
+			SimpleForm sf = new SimpleForm("请选择队伍","");
+			List<Runnable> runs = new ArrayList<>();
+			for (Team team : game.getTeams().values()) {
+				if (!team.equals(game.getPlayerTeam(player))) {
+					sf.addButton(new ModalButton(team.getChatColor()+team.getName()));
+					runs.add(()->{
+						if ((gui =="§a§i")) {
+							sendMessage(player, game.getPlayerTeam(player), Config.compass_message_VI_II.replace("{player}", player.getName()).replace("{color}", team.getChatColor() + "").replace("{team}", team.getName()));
+						} else if ((gui =="§a")) {
+							sendMessage(player, game.getPlayerTeam(player), Config.compass_message_VI_III.replace("{player}", player.getName()).replace("{color}", team.getChatColor() + "").replace("{team}", team.getName()));
+						}
+					});
+				}
+			}
+			SimpleFormCallback callback = new SimpleFormCallback() {
+				@Override
+				public void onSimpleFormResponse(Player player, String output, boolean quit, int slot) {
+					if (!quit && slot != -1) {
+						runs.get(slot).run();
+					}
+				}
+			};
+			Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> PocketPlayer.sendModal(player, sf, callback), 5L);
+
+
+			return;
+		}
+		Inventory inventory = Bukkit.createInventory(null, 36, Config.compass_gui_title + gui);
+
 		int i = 10;
 		for (Team team : game.getTeams().values()) {
 			if (!team.equals(game.getPlayerTeam(player))) {
@@ -347,11 +454,47 @@ public class Compass implements Listener {
 	}
 
 	private void openSelectResourcesMenu(Player player, String gui) {
-		Inventory inventory = Bukkit.createInventory(null, 36, Config.compass_gui_title + gui);
+
 		Game game = BedwarsRel.getInstance().getGameManager().getGameOfPlayer(player);
 		if (game == null) {
 			return;
 		}
+
+		if (PocketPlayer.isPocketPlayer(player)){
+			SimpleForm sf= new SimpleForm("请选择","");
+			List<Runnable> runs = new ArrayList<>();
+
+			for (String type : Config.compass_resources) {
+				sf.addButton(new ModalButton(Config.compass_resources_name.get(type)));
+				runs.add(()->{
+					if ((gui =="§c")) {
+						sendMessage(player, game.getPlayerTeam(player), Config.compass_message_VII_II.replace("{player}", player.getName()).replace("{resource}", Config.compass_resources_name.get(type)));
+					} else if ((gui =="§n")) {
+						sendMessage(player, game.getPlayerTeam(player), Config.compass_message_VII_III.replace("{player}", player.getName()).replace("{resource}", Config.compass_resources_name.get(type)));
+					} else if ((gui =="§h")) {
+						sendMessage(player, game.getPlayerTeam(player), Config.compass_message_VIII_II.replace("{player}", player.getName()).replace("{resource}", Config.compass_resources_name.get(type)));
+					}
+				});
+			}
+
+			SimpleFormCallback callback = new SimpleFormCallback() {
+				@Override
+				public void onSimpleFormResponse(Player player, String output, boolean quit, int slot) {
+					if (!quit && slot != -1) {
+						runs.get(slot).run();
+					}
+				}
+			};
+			Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> PocketPlayer.sendModal(player, sf, callback), 5L);
+
+
+
+			return;
+		}
+
+		Inventory inventory = Bukkit.createInventory(null, 36, Config.compass_gui_title + gui);
+
+
 		int i = 10;
 		for (String type : Config.compass_resources) {
 			if (i == 17) {

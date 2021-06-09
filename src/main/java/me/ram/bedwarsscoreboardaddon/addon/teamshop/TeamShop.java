@@ -39,6 +39,11 @@ import me.ram.bedwarsscoreboardaddon.menu.MenuType;
 import me.ram.bedwarsscoreboardaddon.utils.BedwarsUtil;
 import me.ram.bedwarsscoreboardaddon.utils.ColorUtil;
 import me.ram.bedwarsscoreboardaddon.utils.ItemUtil;
+import org.bukkit.scheduler.BukkitScheduler;
+import protocolsupportpocketstuff.api.modals.SimpleForm;
+import protocolsupportpocketstuff.api.modals.callback.SimpleFormCallback;
+import protocolsupportpocketstuff.api.modals.elements.simple.ModalButton;
+import protocolsupportpocketstuff.api.util.PocketPlayer;
 
 public class TeamShop {
 
@@ -112,8 +117,204 @@ public class TeamShop {
 		Inventory inventory = Bukkit.createInventory(null, trap_amount > 0 ? 45 : 27, Config.teamshop_upgrade_shop_title);
 		setTeamShopItem(player, inventory);
 		player.closeInventory();
-		player.openInventory(inventory);
-		Main.getInstance().getMenuManager().addPlayer(player, MenuType.TEAM_SHOP, inventory);
+		if (PocketPlayer.isPocketPlayer(player)) {
+			//player is pe
+			SimpleForm simpleForm = new SimpleForm(inventory.getTitle(),"团队菜单");
+			List<Runnable> runs = new ArrayList<>();
+
+			for (UpgradeType type : Config.teamshop_upgrade_enabled.keySet()) {
+				if (Config.teamshop_upgrade_enabled.get(type)) {
+					if (type.isTrap()) {
+						trap_amount++;
+						continue;
+					}
+					simpleForm.addButton(new ModalButton(
+									(getStateColor(player, type) + Config.teamshop_upgrade_name.get(type))
+											+"§7§l|§r"+getPlayerTeamUpgradeLevel(player,type)
+											+"阶§7§l|§r"+(formatR(Config.teamshop_upgrade_level_cost.get(type).get(getPlayerTeamUpgradeLevel(player,type)+1))!=null?formatR(Config.teamshop_upgrade_level_cost.get(type).get(getPlayerTeamUpgradeLevel(player,type)+1)):"已满级")
+											+"\n§r"
+											+Config.teamshop_upgrade_level_lore.get(type).get(getPlayerTeamUpgradeLevel(player,type)+1).get(getPlayerTeamUpgradeLevel(player,type)+2)
+							)
+					);
+					runs.add(() -> {
+						Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+							if (type == UpgradeType.SHARPNESS) {
+								int level = getPlayerTeamUpgradeLevel(player, UpgradeType.SHARPNESS);
+								if (level < 2) {
+									if (pay(player, Config.teamshop_upgrade_level_cost.get(UpgradeType.SHARPNESS).get(level + 1))) {
+										getPlayerTeamUpgrade(player, UpgradeType.SHARPNESS).setLevel(level + 1);
+										updateTeamShop(player);
+										for (Player p : getGame().getPlayerTeam(player).getPlayers()) {
+											p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.SHARPNESS))).replace("{level}", getLevel(getPlayerTeamUpgradeLevel(player, UpgradeType.SHARPNESS))));
+										}
+									} else {
+										player.sendMessage(Config.teamshop_message_no_resource);
+										PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+									}
+								}
+							} else if (type == UpgradeType.PROTECTION) {
+								int level = getPlayerTeamUpgradeLevel(player, UpgradeType.PROTECTION);
+								if (level < 4) {
+									if (pay(player, Config.teamshop_upgrade_level_cost.get(UpgradeType.PROTECTION).get(level + 1))) {
+										getPlayerTeamUpgrade(player, UpgradeType.PROTECTION).setLevel(level + 1);
+										updateTeamShop(player);
+										for (Player p : getGame().getPlayerTeam(player).getPlayers()) {
+											p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.PROTECTION))).replace("{level}", getLevel(getPlayerTeamUpgradeLevel(player, UpgradeType.PROTECTION))));
+										}
+									} else {
+										player.sendMessage(Config.teamshop_message_no_resource);
+										PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+									}
+								}
+							} else if (type==UpgradeType.FAST_DIG) {
+								int level = getPlayerTeamUpgradeLevel(player, UpgradeType.FAST_DIG);
+								if (level < 2) {
+									if (pay(player, Config.teamshop_upgrade_level_cost.get(UpgradeType.FAST_DIG).get(level + 1))) {
+										getPlayerTeamUpgrade(player, UpgradeType.FAST_DIG).setLevel(level + 1);
+										updateTeamShop(player);
+										for (Player p : getGame().getPlayerTeam(player).getPlayers()) {
+											p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.FAST_DIG))).replace("{level}", getLevel(getPlayerTeamUpgradeLevel(player, UpgradeType.FAST_DIG))));
+										}
+									} else {
+										player.sendMessage(Config.teamshop_message_no_resource);
+										PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+									}
+								}
+							} else if (type == UpgradeType.IRON_FORGE) {
+								int level = getPlayerTeamUpgradeLevel(player, UpgradeType.IRON_FORGE);
+								if (level < 4) {
+									if (pay(player, Config.teamshop_upgrade_level_cost.get(UpgradeType.IRON_FORGE).get(level + 1))) {
+										getPlayerTeamUpgrade(player, UpgradeType.IRON_FORGE).setLevel(level + 1);
+										updateTeamShop(player);
+										for (Player p : getGame().getPlayerTeam(player).getPlayers()) {
+											p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.IRON_FORGE))).replace("{level}", getLevel(getPlayerTeamUpgradeLevel(player, UpgradeType.IRON_FORGE))));
+										}
+									} else {
+										player.sendMessage(Config.teamshop_message_no_resource);
+										PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+									}
+								}
+							} else if (type == UpgradeType.HEAL) {
+								if (getPlayerTeamUpgradeLevel(player, UpgradeType.HEAL) < 1) {
+									if (pay(player, Config.teamshop_upgrade_level_cost.get(UpgradeType.HEAL).get(1))) {
+										getPlayerTeamUpgrade(player, UpgradeType.HEAL).setLevel(1);
+										updateTeamShop(player);
+										for (Player p : getGame().getPlayerTeam(player).getPlayers()) {
+											p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.HEAL))).replace("{level}", ""));
+										}
+									} else {
+										player.sendMessage(Config.teamshop_message_no_resource);
+										PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+									}
+								}
+							} else if (type== UpgradeType.TRAP) {
+//								openTeamShopTrap(player);
+//								System.out.println("player click "+ UpgradeType.TRAP.name());
+							}
+
+//							System.out.println("player click "+ Config.teamshop_upgrade_name.get(type));
+						}, 5L);
+					});
+				}
+			}
+
+			if (trap_amount > 0) {
+				List<Upgrade> list = upgrades_trap.getOrDefault(game.getPlayerTeam(player), new ArrayList<Upgrade>());
+				int size = list.size();
+				simpleForm.addButton(new ModalButton(
+								Config.teamshop_upgrade_shop_trap_name
+						)
+				);
+				runs.add(()->{
+					Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(),()->{
+						openTeamShopTrap(player);
+					},5L);
+
+				});
+				ItemStack trap = new ItemStack(Material.STAINED_GLASS, 1, (short) 8);
+				int lev = size;
+				lev = lev > 2 ? 2 : lev;
+				String next_cost = Config.teamshop_trap_level_cost.get(lev + 1).split(",")[1];
+				if (size > 0) {
+					Upgrade upgrade = list.get(0);
+					trap.setType(Material.valueOf(Config.teamshop_upgrade_item.get(upgrade.getType())));
+					trap.setDurability((short) 0);
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_1_unlock).replace("{trap}", upgrade.getName()).replace("{buyer}", upgrade.getBuyer()).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_1_unlock), "{trap}", upgrade.getName(), "{buyer}", upgrade.getBuyer(), "{cost}", next_cost));
+				} else {
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_1_lock).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_1_lock), "{cost}", next_cost));
+				}
+				ItemUtil.addItemFlags(trap, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+//				inventory.setItem(30, trap);
+				simpleForm.addButton(new ModalButton(
+								trap.getItemMeta().getDisplayName()+"\n"+trap.getItemMeta().getLore().get(trap.getItemMeta().getLore().size()-1)
+						)
+				);
+				runs.add(()->{});
+				trap = new ItemStack(Material.STAINED_GLASS, 1, (short) 8);
+				if (size > 1) {
+					Upgrade upgrade = list.get(1);
+					trap.setType(Material.valueOf(Config.teamshop_upgrade_item.get(upgrade.getType())));
+					trap.setDurability((short) 0);
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_2_unlock).replace("{trap}", upgrade.getName()).replace("{buyer}", upgrade.getBuyer()).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_2_unlock), "{trap}", upgrade.getName(), "{buyer}", upgrade.getBuyer(), "{cost}", next_cost));
+				} else {
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_2_lock).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_2_lock), "{cost}", next_cost));
+				}
+				ItemUtil.addItemFlags(trap, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+//				inventory.setItem(31, trap);
+				simpleForm.addButton(new ModalButton(
+						trap.getItemMeta().getDisplayName()+"\n"+trap.getItemMeta().getLore().get(trap.getItemMeta().getLore().size()-1)
+						)
+				);
+				runs.add(()->{});
+				trap = new ItemStack(Material.STAINED_GLASS, 1, (short) 8);
+				if (size > 2) {
+					Upgrade upgrade = list.get(2);
+					trap.setType(Material.valueOf(Config.teamshop_upgrade_item.get(upgrade.getType())));
+					trap.setDurability((short) 0);
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_3_unlock).replace("{trap}", upgrade.getName()).replace("{buyer}", upgrade.getBuyer()).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_3_unlock), "{trap}", upgrade.getName(), "{buyer}", upgrade.getBuyer(), "{cost}", next_cost));
+				} else {
+					ItemUtil.setItemName(trap, getItemName(Config.teamshop_trap_trap_list_trap_3_lock).replace("{cost}", next_cost));
+					ItemUtil.setItemLore(trap, replaceLore(getItemLore(Config.teamshop_trap_trap_list_trap_3_lock), "{cost}", next_cost));
+				}
+				ItemUtil.addItemFlags(trap, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS);
+				inventory.setItem(32, trap);
+				simpleForm.addButton(new ModalButton(
+						trap.getItemMeta().getDisplayName()+"\n"+trap.getItemMeta().getLore().get(trap.getItemMeta().getLore().size()-1)
+						)
+				);
+				runs.add(()->{});
+			}
+
+
+			SimpleFormCallback callback = new SimpleFormCallback() {
+				@Override
+				public void onSimpleFormResponse(Player player, String output, boolean quit, int slot) {
+					if (!quit && slot != -1) {
+						runs.get(slot).run();
+					}
+				}
+			};
+
+			Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> PocketPlayer.sendModal(player, simpleForm, callback), 5L);
+
+		}else{
+			player.openInventory(inventory);
+			Main.getInstance().getMenuManager().addPlayer(player, MenuType.TEAM_SHOP, inventory);
+		}
+
+	}
+
+	private String formatR(String s) {
+		if (s == null)return null;
+
+		return s.replace(",","x")
+				.replace("DIAMOND","§b钻石")
+				;
 	}
 
 	public void openTeamShopTrap(Player player) {
@@ -126,8 +327,110 @@ public class TeamShop {
 		Inventory inventory = Bukkit.createInventory(null, 27, Config.teamshop_trap_shop_title);
 		setTeamShopTrapItem(player, inventory);
 		player.closeInventory();
-		player.openInventory(inventory);
-		Main.getInstance().getMenuManager().addPlayer(player, MenuType.TEAM_SHOP_TRAP, inventory);
+		if (PocketPlayer.isPocketPlayer(player)) {
+			SimpleForm simpleForm = new SimpleForm(inventory.getTitle(),"选择一个陷阱吧!");
+			List<Runnable> runs = new ArrayList<>();
+			for (UpgradeType type : Config.teamshop_upgrade_enabled.keySet()) {
+				if (Config.teamshop_upgrade_enabled.get(type) && type.isTrap()) {
+					ItemStack itemStack = ItemUtil.createItem(Config.teamshop_upgrade_item.get(type));
+					ItemMeta itemMeta = itemStack.getItemMeta();
+					int level = getPlayerTeamUpgradeTrapLevel(player);
+					int lev = level;
+					lev = lev > 2 ? 2 : lev;
+					String next_cost = Config.teamshop_trap_level_cost.get(lev + 1).split(",")[1];
+					if (level < 3) {
+						itemMeta.setLore(Config.teamshop_upgrade_level_lore.get(type).get(1));
+					} else {
+						itemMeta.setLore(Config.teamshop_upgrade_level_lore.get(type).get(2));
+					}
+					itemMeta.setLore(replaceLore(itemMeta.getLore(), "{state}", getState(player, type), "{cost}", next_cost));
+
+					String a = (getStateValue(player, type)!=0&&getStateValue(player, type)!=1?"已解锁":itemMeta.getLore().get(0));
+					String name = getStateColor(player, type) + Config.teamshop_upgrade_name.get(type) +" | §b钻石x"+ next_cost+"\n" + a;
+					simpleForm.addButton(new ModalButton(name));
+					runs.add(()->{
+						if (type==UpgradeType.TRAP) {
+							if (level < 3) {
+								if (pay(player, Config.teamshop_trap_level_cost.get(level + 1))) {
+									createTrapUpgrade(player, UpgradeType.TRAP);
+									updateTeamShop(player);
+									for (Player p : game.getPlayerTeam(player).getPlayers()) {
+										p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.TRAP))).replace("{level}", ""));
+									}
+									openTeamShop(player);
+								} else {
+									player.sendMessage(Config.teamshop_message_no_resource);
+									PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+								}
+							}
+						} else if (type == UpgradeType.COUNTER_OFFENSIVE_TRAP) {
+							if (level < 3) {
+								if (pay(player, Config.teamshop_trap_level_cost.get(level + 1))) {
+									createTrapUpgrade(player, UpgradeType.COUNTER_OFFENSIVE_TRAP);
+									updateTeamShop(player);
+									for (Player p : game.getPlayerTeam(player).getPlayers()) {
+										p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.COUNTER_OFFENSIVE_TRAP))).replace("{level}", ""));
+									}
+									openTeamShop(player);
+								} else {
+									player.sendMessage(Config.teamshop_message_no_resource);
+									PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+								}
+							}
+						} else if (type == UpgradeType.ALARM_TRAP) {
+							if (level < 3) {
+								if (pay(player, Config.teamshop_trap_level_cost.get(level + 1))) {
+									createTrapUpgrade(player, UpgradeType.ALARM_TRAP);
+									updateTeamShop(player);
+									for (Player p : game.getPlayerTeam(player).getPlayers()) {
+										p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.ALARM_TRAP))).replace("{level}", ""));
+									}
+									openTeamShop(player);
+								} else {
+									player.sendMessage(Config.teamshop_message_no_resource);
+									PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+								}
+							}
+						} else if (type == UpgradeType.DEFENSE) {
+							if (level < 3) {
+								if (pay(player, Config.teamshop_trap_level_cost.get(level + 1))) {
+									createTrapUpgrade(player, UpgradeType.DEFENSE);
+									updateTeamShop(player);
+									for (Player p : game.getPlayerTeam(player).getPlayers()) {
+										p.sendMessage(Config.teamshop_message_upgrade.replace("{player}", player.getName()).replace("{upgrade}", ColorUtil.removeColor(Config.teamshop_upgrade_name.get(UpgradeType.DEFENSE))).replace("{level}", ""));
+									}
+									openTeamShop(player);
+								} else {
+									player.sendMessage(Config.teamshop_message_no_resource);
+									PlaySound.playSound(player, Config.play_sound_sound_no_resource);
+								}
+							}
+						}
+					});
+				}
+
+			}
+			simpleForm.addButton(new ModalButton("返回上一页"));
+			runs.add(()-> {
+				Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(),()->{
+					openTeamShop(player);
+				},5L);
+			});
+			SimpleFormCallback callback = new SimpleFormCallback() {
+				@Override
+				public void onSimpleFormResponse(Player player, String output, boolean quit, int slot) {
+					if (!quit && slot != -1) {
+						runs.get(slot).run();
+					}
+				}
+			};
+			Main.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> PocketPlayer.sendModal(player, simpleForm, callback), 5L);
+
+		}else{
+			player.openInventory(inventory);
+			Main.getInstance().getMenuManager().addPlayer(player, MenuType.TEAM_SHOP_TRAP, inventory);
+		}
+
 	}
 
 	public void onEnd() {

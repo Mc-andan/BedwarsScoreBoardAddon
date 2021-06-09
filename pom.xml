@@ -49,16 +49,17 @@
     </build>
 
     <repositories>
-        <repository>
-            <id>everything</id>
-            <url>http://repo.citizensnpcs.co/</url>
-        </repository>
 
         <repository>
             <id>nexus</id>
             <name>releases</name>
             <url>http://lnexus.bjd-mc.com:8081/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>everything</id>
+            <url>http://repo.citizensnpcs.co/</url>
+        </repository>
+
         <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -100,7 +101,7 @@
         <dependency>
             <groupId>io.github</groupId>
             <artifactId>BedwarsRel</artifactId>
-            <version>1.3.6</version>
+            <version>1.3.6_3</version>
             <classifier>shaded</classifier>
             <scope>provided</scope>
         </dependency>
@@ -126,6 +127,13 @@
             <groupId>com.sk89q</groupId>
             <artifactId>WorldEdit</artifactId>
             <version>6.1.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>protocolsupportpocketstuff</groupId>
+            <artifactId>ProtocolSupportPocketStuff</artifactId>
+            <version>0.01</version>
+            <classifier>dev</classifier>
             <scope>provided</scope>
         </dependency>
 

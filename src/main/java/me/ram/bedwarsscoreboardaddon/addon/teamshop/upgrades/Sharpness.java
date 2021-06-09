@@ -51,7 +51,9 @@ public class Sharpness implements Upgrade {
 			ItemStack[] stacks = player.getInventory().getContents();
 			for (int j = 0; j < i; j++) {
 				final ItemStack stack = stacks[j];
-				if (stack != null && (stack.getType().name().contains("_SWORD") || stack.getType().name().contains("_AXE"))) {
+//				if (stack != null && (stack.getType().name().contains("_SWORD") || stack.getType().name().contains("_AXE"))) {
+				//2021年5月22日16:34:33 移除斧头的锋利效果
+				if (stack != null && (stack.getType().name().contains("_SWORD"))) {
 					ItemStack itemStack = stack;
 					ItemMeta itemMeta = itemStack.getItemMeta();
 					if (level > 0) {

@@ -1,10 +1,6 @@
 package me.ram.bedwarsscoreboardaddon.arena;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -203,6 +199,20 @@ public class Arena {
 			if (Config.overstats_enabled && e.getWinner() != null) {
 				Team winner = e.getWinner();
 				Map<String, Integer> totalkills = playerGameStorage.getPlayerTotalKills();
+				List<Map.Entry<String,Integer>> lists = new ArrayList<>(totalkills.entrySet());
+				Collections.sort(lists, (o1, o2) -> {
+					double q1=o1.getValue();
+					double q2=o2.getValue();
+					double p=q2-q1;
+					if(p>0){
+						return 1;
+					}
+					else if(p==0){
+						return 0;
+					}
+					else
+						return -1;
+				});
 				Map<Integer, List<String>> player_kills = new HashMap<Integer, List<String>>();
 				totalkills.forEach((name, kills) -> {
 					List<String> players = player_kills.getOrDefault(kills, new ArrayList<String>());
@@ -214,19 +224,23 @@ public class Arena {
 				Collections.sort(kills_top);
 				List<String> player_rank_name = new ArrayList<String>();
 				List<Integer> player_rank_kills = new ArrayList<Integer>();
-				for (Integer kills : kills_top) {
-					for (String name : player_kills.get(kills)) {
-						if (player_rank_name.size() < 3) {
-							player_rank_name.add(name);
-							player_rank_kills.add(kills);
-						} else {
-							break;
-						}
-					}
+				for(Map.Entry<String, Integer> set:lists){
+					player_rank_name.add(set.getKey());
+					player_rank_kills.add(set.getValue());
 				}
+//				for (Integer kills : kills_top) {
+//					for (String name : player_kills.get(kills)) {
+//						if (player_rank_name.size() < 3) {
+//							player_rank_name.add(name);
+//							player_rank_kills.add(kills);
+//						} else {
+//							break;
+//						}
+//					}
+//				}
 				int size = player_rank_name.size();
 				for (int i = 0; i < 3 - size; i++) {
-					player_rank_name.add("none");
+					player_rank_name.add("无");
 					player_rank_kills.add(0);
 				}
 				String win_team_player_list = "";
@@ -235,7 +249,16 @@ public class Arena {
 				}
 				for (Player player : game.getPlayers()) {
 					for (String msg : Config.overstats_message) {
-						player.sendMessage(msg.replace("{color}", winner.getChatColor() + "").replace("{win_team}", winner.getName()).replace("{win_team_players}", win_team_player_list).replace("{first_1_kills_player}", player_rank_name.get(0)).replace("{first_2_kills_player}", player_rank_name.get(1)).replace("{first_3_kills_player}", player_rank_name.get(2)).replace("{first_1_kills}", player_rank_kills.get(0) + "").replace("{first_2_kills}", player_rank_kills.get(1) + "").replace("{first_3_kills}", player_rank_kills.get(2) + ""));
+						player.sendMessage(msg.replace("{color}", winner.getChatColor() + "")
+								.replace("{win_team}", winner.getName())
+								.replace("{win_team_players}", win_team_player_list)
+								.replace("{first_1_kills_player}", player_rank_name.get(0))
+								.replace("{first_2_kills_player}", player_rank_name.get(1))
+								.replace("{first_3_kills_player}", player_rank_name.get(2))
+								.replace("{first_1_kills}", player_rank_kills.get(0) + "")
+								.replace("{first_2_kills}", player_rank_kills.get(1) + "")
+								.replace("{first_3_kills}", player_rank_kills.get(2) + "")
+						);
 					}
 				}
 			}

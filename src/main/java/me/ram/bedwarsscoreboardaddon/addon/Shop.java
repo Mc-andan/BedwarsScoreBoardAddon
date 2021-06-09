@@ -160,7 +160,7 @@ public class Shop implements Listener {
 		if (!Config.shop_enabled) {
 			return;
 		}
-		Player player = (Player) e.getPlayer();
+		Player player = e.getPlayer();
 		if (player.getGameMode().equals(GameMode.SPECTATOR)) {
 			e.setCancelled(true);
 			return;
